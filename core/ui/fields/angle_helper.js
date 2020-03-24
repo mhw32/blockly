@@ -51,6 +51,7 @@ Blockly.AngleHelper = function(direction, opt_options) {
   this.svg_ = null;
   this.rect_ = null;
   this.variableLine_ = null;
+  this.referenceLine_ = null;
 
   this.animationInterval_ = null;
 
@@ -115,7 +116,7 @@ Blockly.AngleHelper.prototype.init = function(svgContainer) {
   this.mouseUpWrapper_ = Blockly.bindEvent_(this.svg_, 'mouseup', this, this.stopDrag_);
   this.mouseDownWrapper_ = Blockly.bindEvent_(this.svg_, 'mousedown', this, this.startDrag_);
 
-  Blockly.createSvgElement('line', {
+  this.referenceLine_ = Blockly.createSvgElement('line', {
     'stroke': this.lineColour_,
     'stroke-width': this.strokeWidth_,
     'stroke-linecap': 'round',
@@ -263,6 +264,7 @@ Blockly.AngleHelper.prototype.dispose = function() {
   this.circle_ = null;
   this.svg_ = null;
   this.variableLine_ = null;
+  this.referenceLine_ = null;
 };
 
 /**
