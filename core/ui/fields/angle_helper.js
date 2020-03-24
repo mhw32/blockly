@@ -51,7 +51,7 @@ Blockly.AngleHelper = function(direction, opt_options) {
   this.arc_ = null;
   this.handle_ = null;
   this.svg_ = null;
-  this.rect_ = null;
+  this.boundingRect_ = null;
   this.variableLine_ = null;
 
   this.animationInterval_ = null;
@@ -112,7 +112,7 @@ Blockly.AngleHelper.prototype.init = function(svgContainer) {
     'width': this.width_ + 'px',
     'style': 'background: rgb(255, 255, 255);',
   }, svgContainer);
-  this.rect_ = this.svg_.getBoundingClientRect();
+  this.boundingRect_ = this.svg_.getBoundingClientRect();
   this.mouseMoveWrapper_ = Blockly.bindEvent_(this.svg_, 'mousemove', this, this.updateDrag_);
   this.mouseUpWrapper_ = Blockly.bindEvent_(this.svg_, 'mouseup', this, this.stopDrag_);
   this.mouseDownWrapper_ = Blockly.bindEvent_(this.svg_, 'mousedown', this, this.startDrag_);
@@ -199,8 +199,8 @@ Blockly.AngleHelper.prototype.update_ = function() {
 };
 
 Blockly.AngleHelper.prototype.startDrag_ = function(e) {
-  var x = e.clientX - this.rect_.left;
-  var y = e.clientY - this.rect_.top;
+  var x = e.clientX - this.boundingRect_.left;
+  var y = e.clientY - this.boundingRect_.top;
   var mouseLoc = new goog.math.Vec2(x, y);
   var distanceFromCenter = goog.math.Vec2.distance(this.center_, mouseLoc);
   if (goog.math.Vec2.distance(this.handleCenter_, mouseLoc) < this.handleR_) {
@@ -216,8 +216,8 @@ Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
     return;
   }
 
-  var x = e.clientX - this.rect_.left;
-  var y = e.clientY - this.rect_.top;
+  var x = e.clientX - this.boundingRect_.left;
+  var y = e.clientY - this.boundingRect_.top;
   var angle = goog.math.angle(this.center_.x, this.center_.y, x, y);
 
   if (!this.turnRight_) {
