@@ -50,7 +50,7 @@ Blockly.AngleHelper = function(direction, opt_options) {
   this.handle_ = null;
   this.svg_ = null;
   this.rect_ = null;
-  this.variableLine_ = null;
+  this.pickerLine_ = null;
   this.referenceLine_ = null;
 
   this.animationInterval_ = null;
@@ -151,7 +151,7 @@ Blockly.AngleHelper.prototype.init = function(svgContainer) {
     }, this.svg_);
   }
 
-  this.variableLine_ = Blockly.createSvgElement('line', {
+  this.pickerLine_ = Blockly.createSvgElement('line', {
     'stroke': this.lineColour_,
     'stroke-width': this.strokeWidth_,
     'stroke-linecap': 'round',
@@ -186,8 +186,8 @@ Blockly.AngleHelper.prototype.update_ = function() {
     goog.math.toRadians(this.turnRight_ ? this.angle_ : -this.angle_)
   );
 
-  this.variableLine_.setAttribute('x2', this.handleCenter_.x);
-  this.variableLine_.setAttribute('y2', this.handleCenter_.y);
+  this.pickerLine_.setAttribute('x2', this.handleCenter_.x);
+  this.pickerLine_.setAttribute('y2', this.handleCenter_.y);
 
   this.handle_.setAttribute('cx', this.handleCenter_.x);
   this.handle_.setAttribute('cy', this.handleCenter_.y);
@@ -263,7 +263,7 @@ Blockly.AngleHelper.prototype.dispose = function() {
   this.arc_ = null;
   this.handle_ = null;
   this.svg_ = null;
-  this.variableLine_ = null;
+  this.pickerLine_ = null;
   this.referenceLine_ = null;
 };
 
