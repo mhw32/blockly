@@ -34,7 +34,7 @@ Blockly.AngleHelper = function(direction, opt_options) {
   this.turnRight_ = direction === 'turnRight';
   this.lineColour_ = '#4d575f';
   this.handleR_ = 10;
-  this.dragging_ = false;
+  this.draggingHandle_ = false;
   this.strokeWidth_ = 3;
   
 
@@ -200,12 +200,18 @@ Blockly.AngleHelper.prototype.update_ = function() {
   this.arc_.setAttribute('d', Blockly.AngleHelper.describeArc(this.center_, 20, arcStart, arcEnd));
 };
 
-Blockly.AngleHelper.prototype.startDrag_ = function() {
-  this.dragging_ = true;
+Blockly.AngleHelper.prototype.startDrag_ = function(e) {
+  var handleCenter = new goog.math.Vec2(this.handle_.getAttribute('cx'), this.handle_.getAttribute('cy'))
+  var x = e.clientX - this.rect_.left;
+  var y = e.clientY - this.rect_.top;
+  var mouseLoc = new goog.math.Vec2(x, y);
+  if (goog.math.Vec2.distance(handleCenter, mouseLoc) < this.handleR_) {
+    this.draggingHandle_ = true;
+  }
 };
 
 Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
-  if (!this.dragging_) {
+  if (!this.draggingHandle_) {
     return;
   }
 
@@ -228,7 +234,7 @@ Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
 };
 
 Blockly.AngleHelper.prototype.stopDrag_ = function() {
-  this.dragging_ = false;
+  this.draggingHandle_ = false;
 };
 
 /**
