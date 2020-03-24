@@ -33,11 +33,11 @@ Blockly.AngleHelper = function(direction, opt_options) {
   this.handleR_ = 10;
   this.dragging_ = false;
   this.strokeWidth_ = 3;
+  this.radius_ = Math.min(this.height_, this.width_) - this.handleR_ - this.strokeWidth_;
 
   this.center_ = new goog.math.Vec2(this.width_ / 2, this.height_ / 2);
 
-  var circumference = Math.min(this.height_, this.width_);
-  this.lineLength_ = new goog.math.Vec2((circumference / 2) - this.handleR_ - this.strokeWidth_, 0);
+  this.lineLength_ = new goog.math.Vec2(this.radius_, 0);
 
   this.handleCenter_ = this.center_.clone().add(this.lineLength_)
   this.handleCenter_ = goog.math.Vec2.rotateAroundPoint(
