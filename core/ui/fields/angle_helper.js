@@ -240,7 +240,7 @@ Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
   var angle = goog.math.angle(this.center_.x, this.center_.y, x, y);
 
   if (this.draggingHandle_) {
-    this.updatePicker_(angle);
+    this.updatePicker_(angle - this.referenceAngle_);
   }
   if (this.draggingCircle_) {
     this.updateCircle_(angle);
