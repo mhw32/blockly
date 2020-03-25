@@ -35,6 +35,7 @@ Blockly.AngleHelper = function(direction, opt_options) {
   this.draggingCircle_ = false;
   this.strokeWidth_ = 3;
   this.radius_ = new goog.math.Vec2(Math.min(this.height_, this.width_) / 2 - this.handleR_ - this.strokeWidth_, 0);
+  this.referenceAngle_ = 0;
 
   this.center_ = new goog.math.Vec2(this.width_ / 2, this.height_ / 2);
 
@@ -51,6 +52,7 @@ Blockly.AngleHelper = function(direction, opt_options) {
   this.rect_ = null;
   this.pickerLine_ = null;
   this.referenceLine_ = null;
+  this.ticks_ = null;
 
   this.animationInterval_ = null;
 
@@ -133,11 +135,12 @@ Blockly.AngleHelper.prototype.init = function(svgContainer) {
   }, this.svg_);
 
   // Draw markers every 15 degrees around the edge.
-  for (var angle = 15; angle < 360; angle += 15) {
+  this.ticks_ = [];
+  for (var angle = 0; angle < 360; angle += 15) {
     // define three marker sizes; 5px, 10px, and 15px at angles modulo
     // 15, 45, and 90 degrees, respectively.
     var markerSize = (angle % 90 == 0 ? 15 : angle % 45 == 0 ? 10 : 5);
-    Blockly.createSvgElement('line', {
+    this.ticks_.push(Blockly.createSvgElement('line', {
       'stroke-linecap': 'round',
       'stroke-opacity': '0.6',
       'stroke': this.lineColour_,
@@ -147,7 +150,7 @@ Blockly.AngleHelper.prototype.init = function(svgContainer) {
       'y2': this.center_.y,
       'class': 'blocklyAngleMarks',
       'transform': 'rotate(' + angle + ', ' + this.center_.x + ', ' + this.center_.y + ')'
-    }, this.svg_);
+    }, this.svg_));
   }
 
   this.pickerLine_ = Blockly.createSvgElement('line', {
@@ -182,7 +185,7 @@ Blockly.AngleHelper.prototype.update_ = function() {
   this.handleCenter_ = goog.math.Vec2.rotateAroundPoint(
     this.center_.clone().add(this.radius_),
     this.center_,
-    goog.math.toRadians(this.turnRight_ ? this.angle_ : -this.angle_)
+    goog.math.toRadians(this.referenceAngle_ + (this.turnRight_ ? this.angle_ : -this.angle_))
   );
 
   this.pickerLine_.setAttribute('x2', this.handleCenter_.x);
@@ -191,8 +194,14 @@ Blockly.AngleHelper.prototype.update_ = function() {
   this.handle_.setAttribute('cx', this.handleCenter_.x);
   this.handle_.setAttribute('cy', this.handleCenter_.y);
 
-  var arcStart = 0;
-  var arcEnd = this.turnRight_ ? this.angle_ : -this.angle_;
+  this.referenceLine_.setAttribute('transform', 'rotate(' + this.referenceAngle_ + ', ' + this.center_.x + ', ' + this.center_.y + ')');
+  for (var i = 0; i < this.ticks_.length; i++) {
+    var angle = (15 * i + this.referenceAngle_) % 360;
+    this.ticks_[i].setAttribute('transform', 'rotate(' + angle + ', ' + this.center_.x + ', ' + this.center_.y + ')')
+  }
+
+  var arcStart = this.referenceAngle_;
+  var arcEnd = this.referenceAngle_ + (this.turnRight_ ? this.angle_ : -this.angle_);
   this.arc_.setAttribute('d', Blockly.AngleHelper.describeArc(this.center_, 20, arcStart, arcEnd));
 };
 
@@ -208,15 +217,7 @@ Blockly.AngleHelper.prototype.startDrag_ = function(e) {
   }
 };
 
-Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
-  if (!this.draggingHandle_) {
-    return;
-  }
-
-  var x = e.clientX - this.rect_.left;
-  var y = e.clientY - this.rect_.top;
-  var angle = goog.math.angle(this.center_.x, this.center_.y, x, y);
-
+Blockly.AngleHelper.prototype.updatePicker_ = function(angle) {
   if (!this.turnRight_) {
     angle = goog.math.standardAngle(-angle);
   }
@@ -225,6 +226,24 @@ Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
 
   if (this.onUpdate_) {
     this.onUpdate_();
+  }
+}
+
+Blockly.AngleHelper.prototype.updateCircle_ = function(angle) {
+  this.referenceAngle_ = angle;
+  this.update_();
+}
+
+Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
+  var x = e.clientX - this.rect_.left;
+  var y = e.clientY - this.rect_.top;
+  var angle = goog.math.angle(this.center_.x, this.center_.y, x, y);
+
+  if (this.draggingHandle_) {
+    this.updatePicker_(angle);
+  }
+  if (this.draggingCircle_) {
+    this.updateCircle_(angle);
   }
 
   e.stopPropagation();
@@ -273,6 +292,8 @@ Blockly.AngleHelper.prototype.dispose = function() {
   this.svg_ = null;
   this.pickerLine_ = null;
   this.referenceLine_ = null;
+  this.ticks_ = null;
+  this.referenceAngle_ = 0;
 };
 
 /**
