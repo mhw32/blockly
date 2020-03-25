@@ -210,9 +210,10 @@ Blockly.AngleHelper.prototype.startDrag_ = function(e) {
   var y = e.clientY - this.rect_.top;
   var mouseLoc = new goog.math.Vec2(x, y);
   var distanceFromCenter = goog.math.Vec2.distance(this.center_, mouseLoc);
+  var angle = goog.math.angle(this.center_.x, this.center_.y, x, y);
   if (goog.math.Vec2.distance(this.handleCenter_, mouseLoc) < this.handleR_) {
     this.draggingHandle_ = true;
-  } else if (Math.abs(distanceFromCenter - this.radius_.magnitude()) < 10) {
+  } else if (Math.abs(this.referenceAngle_ - angle) < 10 && distanceFromCenter < (this.radius_.magnitude() + 10)) {
     this.draggingCircle_ = true;
   }
 };
@@ -240,7 +241,7 @@ Blockly.AngleHelper.prototype.updateDrag_ = function(e) {
   var angle = goog.math.angle(this.center_.x, this.center_.y, x, y);
 
   if (this.draggingHandle_) {
-    this.updatePicker_(angle - this.referenceAngle_);
+    this.updatePicker_(goog.math.standardAngle(angle - this.referenceAngle_));
   }
   if (this.draggingCircle_) {
     this.updateCircle_(angle);
